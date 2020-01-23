@@ -36,23 +36,25 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(b)
 }
 
+func getBookById(w http.ResponseWriter, r *http.Request) {
+	var b Book = RetrieveBookById(1)
+
+	json.NewEncoder(w).Encode(b)
+}
+
 /* Decides which function should answer to the given api path */
 func handleRequests() {
 
 	http.HandleFunc("/", home)
 	http.HandleFunc("/greet-me/", greetMe)
 	http.HandleFunc("/books", getBooks)
+	http.HandleFunc("/books/", getBookById)
 
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
 
 /* Main method, calls the handling request method on init */
 func main() {
-
-	books = []Book{
-		Book{Title: "Test1", Author: "Auth1", Pages: 2},
-		Book{Title: "Test2", Author: "Auth2", Pages: 3},
-	}
 
 	handleRequests()
 }
