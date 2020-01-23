@@ -1,9 +1,13 @@
 package main
 
 /* Imports */
-import "fmt"
+import (
+	"fmt"
+)
 
 /* Main method */
 func main() {
 	fmt.Println("Hello, World!")
+	Print("Hello again!")
+	fmt.Printf("%v", Sum(1, 2))
 }
