@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -15,7 +16,7 @@ func home(w http.ResponseWriter, r *http.Request) {
 
 /* Answers the '/greet-me/{name}' api path */
 func greetMe(w http.ResponseWriter, r *http.Request) {
-	/* Extracts the URL parameter which follows the '/greet-me' path */
+	/* Extracts the URL parameter which follows the '/greet-me/' path */
 	name := strings.TrimPrefix(r.URL.Path, "/greet-me/")
 
 	if len(name) > 0 { /* If a parameter {name} exists */
@@ -30,16 +31,39 @@ func greetMe(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+/* Retrieves a list with all the books */
 func getBooks(w http.ResponseWriter, r *http.Request) {
 	var b []Book = RetrieveBooks()
 
 	json.NewEncoder(w).Encode(b)
 }
 
+/* Retrieves a book with the given ID */
 func getBookById(w http.ResponseWriter, r *http.Request) {
-	var b Book = RetrieveBookById(1)
+	/* Extracts the URL parameter which follows the '/books/' path */
+	id, e := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/books/"))
 
-	json.NewEncoder(w).Encode(b)
+	if e != nil {
+		fmt.Fprintf(w, "No valid ID")
+	} else {
+		b, err := RetrieveBookById(id)
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		} else {
+			json.NewEncoder(w).Encode(b)
+		}
+	}
+}
+
+func getBookByTitle(w http.ResponseWriter, r *http.Request) {
+	title := strings.TrimPrefix(r.URL.Path, "/books/title/")
+
+	bs, err := RetrieveBooksByTitle(title)
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+	} else {
+		json.NewEncoder(w).Encode(bs)
+	}
 }
 
 /* Decides which function should answer to the given api path */
@@ -49,6 +73,7 @@ func handleRequests() {
 	http.HandleFunc("/greet-me/", greetMe)
 	http.HandleFunc("/books", getBooks)
 	http.HandleFunc("/books/", getBookById)
+	http.HandleFunc("/books/title/", getBookByTitle)
 
 	log.Fatal(http.ListenAndServe(":10000", nil))
 }
