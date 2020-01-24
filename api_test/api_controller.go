@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -66,13 +67,24 @@ func getBookByTitle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func createBook(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		/* there's an error reading body data*/
+	} else {
+		fmt.Fprintf(w, "creating\n"+string(body))
+		fmt.Println("creating")
+	}
+}
+
 /* Decides which function should answer to the given api path */
 func handleRequests() {
 
 	http.HandleFunc("/", home)
 	http.HandleFunc("/greet-me/", greetMe)
 	http.HandleFunc("/books", getBooks)
-	http.HandleFunc("/books/", getBookById)
+	http.HandleFunc("/book", createBook)
+	http.HandleFunc("/book/", getBookById)
 	http.HandleFunc("/books/title/", getBookByTitle)
 
 	log.Fatal(http.ListenAndServe(":10000", nil))

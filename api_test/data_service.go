@@ -41,7 +41,6 @@ func RetrieveBooksByTitle(title string) ([]Book, error) {
 	}
 	if len(bs) > 0 {
 		return bs, nil
-	} else {
-		return bs, errors.New("No books found with this Title")
 	}
+	return bs, errors.New("No books found with this Title")
 }
